@@ -1,6 +1,7 @@
 # Thomas  Servo  Eskwire
 
-![TomServo32x32.png](TomServo32x32.png) Sophisticated Microprocessor Controlled Servo Management Library
+![TomServo32x32.png](TomServo32x32.png)
+### Sophisticated Servo Management for the Discriminating User.
 
 The TomServo library gives you more sophisticated control over 
 servo motors as well as offering power saving techniques to 
