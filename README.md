@@ -9,7 +9,7 @@ batteries alone, a large departure from other servo interfaces.
  
 By placing the output pin for the servo into a high-z 
 (high impedence) state we stop the servo motor electronics
-from driving the servo motor thus stopping current flow
+from driving the servo motor, greatly reducing the current flow
 for that motor.  Depending on the nominal load and torque 
 that the motor is under it is usually possible for the motor 
 to remain stationary without being powered due to the gearing
