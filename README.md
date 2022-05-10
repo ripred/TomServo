@@ -1,4 +1,4 @@
-# TomServo
+# Thomas  Servo  Eskwire
 
 ![TomServo32x32.png](TomServo32x32.png) Sophisticated Microprocessor Controlled Servo Management Library
 
