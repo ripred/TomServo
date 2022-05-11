@@ -3,17 +3,12 @@
 ![TomServo32x32.png](TomServo32x32.png)
 ### Sophisticated Servo Management for the Discriminating User.
 
-The TomServo library gives you more sophisticated control over 
-servo motors as well as offering power saving techniques to 
-greatly reduce the amount of power required to use multiple 
-servos in a project.  Multiple servo motors can be powered from 
-batteries alone, a large departure from other servo interfaces.
- 
-By placing the output pin for the servo into a high-z 
-(high impedence) state we stop the servo motor electronics
-from driving the servo motor, greatly reducing the current flow
-for that motor.  Depending on the nominal load and torque 
-that the motor is under it is usually possible for the motor 
-to remain stationary without being powered due to the gearing
-ratios of the servo motor.  This feature can be turned on or off
-as necessary for each individual servo in your project.
+The TomServo library lets you power multiple servos
+from a single rechargeable battery.  By putting the
+servo control pin into a high-z state when it is not 
+being used we can disable the driving of the servo
+and greatly reduces the current flow.
+
+By multiplexing the movements of several servos
+so that only one is on at a time you can run up
+to 8 servos from a single battery.
