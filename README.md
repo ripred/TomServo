@@ -11,4 +11,5 @@ and greatly reduce the current demands.
 
 By multiplexing the movements of several servos
 so that only one is on at a time you can run up
-to 8 servos from a single battery.
+to 8 servos from a single battery. Or many more
+using only a few batteries!
