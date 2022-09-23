@@ -50,8 +50,8 @@ bool TomServo::enableDetachment(bool const allow) {
 
 // move to the initial position. We must start at a known spot initially.
 void TomServo::begin(uint32_t const _pos) {
-    servo.attach(pin, min_width, max_width);
     servo.write(_pos);
+    servo.attach(pin, min_width, max_width);
     delta = 0;
     delayMicroseconds((max_width - min_width) * 60);
     if (allow_detach) {
