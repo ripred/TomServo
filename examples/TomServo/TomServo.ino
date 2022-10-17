@@ -16,7 +16,7 @@
  *
  */
 
-#include "TomServo.h"
+#include <TomServo.h>
 
 static unsigned const Servo1Pin = 5;
 static unsigned const Servo2Pin = 6;
