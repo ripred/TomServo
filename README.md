@@ -13,3 +13,10 @@ By multiplexing the movements of several servos
 so that only one is on at a time you can run up
 to 8 servos from a single battery. Or many more
 using only a few batteries!
+
+In addition to being useful for power consumption, the library 
+allows you to greatly reduce servo jitter in low torque servo 
+applications. By definition, if the servo(s) don't have a lock on
+a valid PWM signal then they also aren't constantly trying to adjust
+their position because they think the servo is ever in the "wrong"
+position.
