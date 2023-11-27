@@ -4,10 +4,11 @@
 ### Sophisticated Servo Management for the Discriminating User.
 
 The TomServo library lets you power multiple servos
-from a single rechargeable battery.  By putting the
+from a single rechargeable battery.  It works by putting the
 servo control pin into a high-z state when it is not 
-being used you can disable the driving of the servo
-and greatly reduce the current used.
+moving so you disable the driving of the servo
+and greatly reduce the current used by all the servos in 
+your project.
 
 By multiplexing the movements of several servos
 so that only one is on at a time you can run up
