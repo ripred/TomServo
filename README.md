@@ -72,4 +72,5 @@ void loop() {
         }
         servo2.write(destination2, duration2);
     }
-}```
+}
+```
