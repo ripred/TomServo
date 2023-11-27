@@ -38,7 +38,7 @@ int const Servo2Pin = 6;
 TomServo servo1(Servo1Pin);
 TomServo servo2(Servo2Pin);
 
-// durations to use to move to destinations (in ms):
+// The time to take to move to destinations (in ms):
 int const duration1 = 2000; // 2 seconds
 int const duration2 = 4000; // 4 seconds
 
