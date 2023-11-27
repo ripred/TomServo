@@ -56,12 +56,20 @@ void loop() {
 
     // change directions when they reach their destinations:
     if (servo1.complete()) {
-        destination1 = (destination1 == 0) ? 180 : 0;
+        if (destination1 == 0) {
+            destination1 = 180;
+        } else {
+            destination1 = 0;
+        }
         servo1.write(destination1, duration1);
     }
 
     if (servo2.complete()) {
-        destination2 = (destination2 == 0) ? 180 : 0;
+        if (destination2 == 0) {
+            destination2 = 180;
+        } else {
+            destination2 = 0;
+        }
         servo2.write(destination2, duration2);
     }
 }```
