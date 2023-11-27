@@ -2,9 +2,9 @@
  * TomServoSweep.ino
  * 
  * Example sweep using two servos.
- * Each servo is swept back and forth over a specified amount of time.
+ * Each servo is swept back and forth using
+ * a specified amount of time.
  */
-
 #include <TomServo.h>
 
 int const Servo1Pin = 5;
@@ -14,8 +14,8 @@ TomServo servo1(Servo1Pin);
 TomServo servo2(Servo2Pin);
 
 // durations to use to move to destinations (in ms):
-int const duration1 = 2000;
-int const duration2 = 4000;
+int const duration1 = 2000; // 2 seconds
+int const duration2 = 4000; // 4 seconds
 
 int destination1 = 0;
 int destination2 = 0;
