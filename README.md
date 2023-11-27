@@ -28,8 +28,7 @@ Example Use:
  * TomServoSweep.ino
  * 
  * Example sweep using two servos.
- * Each servo is swept back and forth using
- * a specified amount of time.
+ * Each servo is swept back and forth using a specified amount of time.
  */
 #include <TomServo.h>
 
