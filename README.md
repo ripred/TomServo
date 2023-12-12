@@ -23,7 +23,7 @@ their position because they think the servo is ever in the "wrong"
 position.
 
 Example Use:
-```
+```cpp
 /* 
  * TomServoSweep.ino
  * 
