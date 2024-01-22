@@ -22,4 +22,4 @@ compile:
 #    - rpipico
 libraries:
   - "SoftwareSerial"
-  - "ArduinoJson"
+  - "Servo"
