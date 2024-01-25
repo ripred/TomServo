@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/release/ripred/TomServo.svg?maxAge=3600)](https://github.com/ripred/TomServo/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/ripred/TomServo/blob/master/LICENSE)
 
-# Thomas  Servo  Eskwire
+# Thomas  Servo  Eskwire 😉
 
 ![TomServo32x32.png](TomServo32x32.png)
 ### Sophisticated Servo Management for the Discriminating User.
