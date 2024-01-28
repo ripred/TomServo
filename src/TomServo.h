@@ -7,8 +7,8 @@
 #ifndef TOMSERVO_H_INCL
 #define TOMSERVO_H_INCL
 
-#include "Arduino.h"
-#include "Servo.h"
+#include <Arduino.h>
+#include <Servo.h>
 #include <inttypes.h>
 #include <ctype.h>
 
