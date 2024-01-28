@@ -1,8 +1,8 @@
-<!-- [![Arduino CI](https://github.com/ripred/TomServo/workflows/Arduino%20CI/badge.svg)](https://github.com/marketplace/actions/arduino_ci) -->
+[![Arduino CI](https://github.com/ripred/TomServo/workflows/Arduino%20CI/badge.svg)](https://github.com/marketplace/actions/arduino_ci)
 [![Arduino-lint](https://github.com/ripred/TomServo/actions/workflows/arduino-lint.yml/badge.svg)](https://github.com/ripred/TomServo/actions/workflows/arduino-lint.yml)
 ![code size](https://img.shields.io/github/languages/code-size/ripred/TomServo)
 [![GitHub release](https://img.shields.io/github/release/ripred/TomServo.svg?maxAge=3600)](https://github.com/ripred/TomServo/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/ripred/TomServo/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ripred/TomServo/blob/master/LICENSE)
 
 # Thomas Servo Eskwire 😉
 <!-- ![TomServo32x32.png](TomServo32x32.png) -->
