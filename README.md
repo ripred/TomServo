@@ -23,7 +23,7 @@ Ideal use cases:
 * Animatronics where servos hold poses for long periods
 * Any project where servo idle current is a problem
 
-## Version 1.0.1
+## Version 1.0.5
 
 This version refines the motion model and internal state handling without changing the public API.
 
@@ -257,7 +257,7 @@ With this pattern:
 
 TomServo is compatible with the Arduino IDE:
 
-1. Install via Arduino Library Manager once the `1.0.1` release is indexed, **or**
+1. Install via Arduino Library Manager **or**
 2. Download or clone this repository into your `libraries/` folder.
 
 Include it in your sketch with:
