@@ -1,4 +1,4 @@
-/**
+/*
  * TomServo Advanced Servo Arduino Library
  *
  * The TomServo library lets you power multiple servos
@@ -11,63 +11,41 @@
  * so that only one is on at a time you can run up
  * to 8 servos from a single battery.
  *
- * v 1.0
+ * v 1.0.0
  * (c) May 2022 trent m. wyatt
  *
+ * v 1.0.1
+ * (c) Dec 2025 trent m. wyatt
+ *
  */
-
 #include <TomServo.h>
 
-static unsigned const Servo1Pin = 5;
-static unsigned const Servo2Pin = 6;
+static uint8_t const SERVO_PIN = 9;
+static uint32_t const MOVE_TIME_US = 2000000UL; // 2 seconds
 
-static uint32_t const speed1 = 2000000L;
-static uint32_t const speed2 = 2000000L;
-
-TomServo servo1(Servo1Pin);
-TomServo servo2(Servo2Pin);
+TomServo servo(SERVO_PIN);
 
 void setup() {
-    Serial.begin(2000000);
-    uint32_t timer = millis() + 250;
-    while (!Serial && millis() < timer) { /* wait for valid Serial or 0.25 second timeout */ }
-
-    Serial.flush();
-    while (Serial.available()) {
-        Serial.read();
-    }
-
-    servo1.begin(DefaultPos);
-    servo2.begin(DefaultPos);
-
-    Serial.print("\nTomServo Test\n");
+    // Start at the default angle (90°)
+    servo.begin(DefaultPos);
 }
 
-
 void loop() {
-    static signed state = 0;
 
-    // press ENTER in serial monitor to stop
-    if (Serial.available() > 0) {
-        servo1.detach();
-        servo2.detach();
-        Serial.print("\nStopped\n");
-        while (true) { }
-    }
+    // Allow the servo to advance toward any scheduled target
+    servo.update();
 
-    servo1.update();
-    servo2.update();
+    static uint16_t target = 0;
 
-    if (servo1.complete()) state++;
-    if (servo2.complete()) state++;
+    if (servo.complete()) {
 
-    state %= 4;
+        if (0 == target) {
+            target = 180;
+        } else {
+            target = 0;
+        }
 
-    switch (state) {
-        default:    break;
-        case 0: servo1.write(servo1.minWidth(), speed1);    break;
-        case 1: servo2.write(servo2.minWidth(), speed2);    break;
-        case 2: servo1.write(servo1.maxWidth(), speed1);    break;
-        case 3: servo2.write(servo2.maxWidth(), speed2);    break;
+        // Timed move from current angle to target over MOVE_TIME_US
+        servo.write(target, MOVE_TIME_US);
     }
 }
