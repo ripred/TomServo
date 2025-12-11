@@ -1,31 +1,16 @@
-##################################################
-# Syntax Coloring Map for Arduino TomServo Library
-##################################################
-# https://github.com/ripred/TomServo
-##################################################
-# Datatypes (KEYWORD1)
-##################################################
+#######################################
+# TomServo Arduino Library Keywords
+#######################################
+
 TomServo	KEYWORD1
 
-##################################################
-# Methods and Functions (KEYWORD2)
-##################################################
-TomServo	KEYWORD2
-enableDetachment	KEYWORD2
 begin	KEYWORD2
 write	KEYWORD2
 update	KEYWORD2
 detach	KEYWORD2
+attached	KEYWORD2
+enableDetachment	KEYWORD2
 minWidth	KEYWORD2
 maxWidth	KEYWORD2
-attached	KEYWORD2
 position	KEYWORD2
 complete	KEYWORD2
-
-##################################################
-# Constants (LITERAL1)
-##################################################
-MinWidth	LITERAL1
-MaxWidth	LITERAL1
-DefaultPos	LITERAL1
-

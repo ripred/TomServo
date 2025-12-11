@@ -1,96 +1,81 @@
-/*\
-|*| TomServo.h
-|*|
-|*|
-\*/
-
-#ifndef TOMSERVO_H_INCL
-#define TOMSERVO_H_INCL
+#ifndef __TOMSERVO_H__
+#define __TOMSERVO_H__
 
 #include <Arduino.h>
 #include <Servo.h>
-#include <inttypes.h>
-#include <ctype.h>
 
-// set the minimum and maximum width of a servo pulse
-static unsigned const MinWidth = 550;
-static unsigned const MaxWidth = 2400;
-static unsigned const DefaultPos = MinWidth + ((MaxWidth - MinWidth) / 2);
+static uint16_t const MinWidth  = 544;
+static uint16_t const MaxWidth  = 2400;
+static uint16_t const DefaultPos = 90;  // default angle in degrees
 
-struct TomServo {
+class TomServo {
+
 private:
-    Servo       servo;          // the servo under control
-    uint16_t    pin : 6,        // the pin # (0 - 63)
-          completed : 1,        // motor is in position (and detached if enabled)
-       allow_detach : 1,        // allow detachment when completed
-          direction : 1;        // incr := 1, decr := 0
-    uint16_t    min_width;      // min microseconds
-    uint16_t    max_width;      // max microseconds
-    uint16_t    pos;            // last written pos in microseconds
-    uint16_t    delta;          // distance to move
-    uint32_t    us_per_inc;     // time per incr or decr
-    uint32_t    last_write;     // time of last write
+    Servo servo;
 
-    // no default ctor
-    TomServo() = delete;
+    uint16_t pin          : 6;
+    uint16_t completed    : 1;
+    uint16_t allow_detach : 1;
+    uint16_t direction    : 1;
 
-    // no copy ctor
-    TomServo(TomServo&) = delete;
+    uint16_t min_width;
+    uint16_t max_width;
 
-    // no assignment
-    TomServo &operator = (TomServo &) = delete;
+    // Current servo position in degrees (same units as Servo::write()).
+    uint16_t pos;
+
+    // Remaining distance to target position, in degrees.
+    uint16_t delta;
+
+    // Time per 1-degree increment, in microseconds.
+    uint32_t us_per_inc;
+
+    // Last time we advanced the servo, from micros().
+    uint32_t last_write;
+
+    TomServo();
+    TomServo(TomServo const &);
+    TomServo & operator=(TomServo const &);
 
 public:
+    TomServo(int const _pin,
+             int const _min = MinWidth,
+             int const _max = MaxWidth,
+             int const _pos = -1);
 
-    // constructor
-    TomServo(signed const _pin,
-             signed const _min = MinWidth,
-             signed const _max = MaxWidth,
-             signed const _pos = -1);
+    ~TomServo();
 
-    // destructor
-    virtual ~TomServo();
-
-    //
-    // Methods
-    //
-
-    // enable or disable detachment after moves have been completed
+    // Enable or disable automatic detach when motion completes.
     bool enableDetachment(bool const allow);
 
-    // move to the initial position. We must start at a known spot initially.
+    // Attach, move immediately to _pos (degrees), wait for motion to complete,
+    // then detach if auto-detach is enabled.
     void begin(uint32_t const _pos);
 
-    // move immediately to a position
-    void write(uint32_t _pos);
+    // Immediate move to _pos (degrees). Attach, write, and then detach if
+    // auto-detach is enabled.
+    void write(uint32_t const _pos);
 
-    // move smoothly to a position over time
-    void write(uint16_t const _pos, uint32_t _dur);
+    // Timed move from current position to _pos (degrees) over dur microseconds.
+    // Actual motion is performed incrementally in update().
+    void write(uint16_t const _pos, uint32_t const dur);
 
-    // give this servo a time slice
+    // Advance motion based on elapsed time since last_write.
+    // Returns true only when motion is already complete and no work is needed.
     bool update();
 
-    // stop driving the output
     void detach();
+    bool attached();
 
-    //
-    // Attributes
-    //
-
-    // get the minimum pulse width in microseconds
     uint32_t minWidth() const;
-
-    // get the maximum pulse width in microseconds
     uint32_t maxWidth() const;
 
-    // see if the servo is attached (driving the output) or not
-    bool     attached();
-
-    // get the current pulse width in milliseconds
+    // Get the current servo position in degrees (same units as Servo::write()).
     uint32_t position() const;
 
-    // see if the target position has been reached
-    bool     complete() const;
+    // True if the current scheduled motion has completed.
+    bool complete() const;
 };
 
-#endif // #ifdef TOMSERVO_H_INCL
+#endif // __TOMSERVO_H__
+
