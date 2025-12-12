@@ -177,14 +177,12 @@ Basic sweep between two angles with timed motion.
     }
 
     void loop() {
-
         // Allow the servo to advance toward any scheduled target
         servo.update();
 
         static uint16_t target = 0;
 
         if (servo.complete()) {
-
             if (0 == target) {
                 target = 180;
             } else {
@@ -231,7 +229,6 @@ Two servos, with moves interleaved so only one is actively driven at a time. Thi
         static uint8_t next_servo = 1;
 
         if (1 == next_servo && servo1.complete() && servo2.complete()) {
-
             target1 = (0 == target1) ? 180 : 0;
             servo1.write(target1, MOVE_TIME1_US);
 
@@ -239,7 +236,6 @@ Two servos, with moves interleaved so only one is actively driven at a time. Thi
         }
 
         if (2 == next_servo && servo1.complete() && servo2.complete()) {
-
             target2 = (0 == target2) ? 180 : 0;
             servo2.write(target2, MOVE_TIME2_US);
 
