@@ -2,21 +2,12 @@
 #include "TomServo.h"
 
 TomServo::TomServo(int const _pin, int const _min, int const _max, int const _pos)
-    : pin(_pin), completed(true), allow_detach(true), direction(0) {
-
-    min_width = _min;
-    max_width = _max;
-
-    // Position is in degrees. If no starting position is provided, use 90°.
-    if (-1 == _pos) {
-        pos = DefaultPos;
-    } else {
-        pos = uint16_t(_pos);
-    }
-
-    delta = 0;
-    us_per_inc = 0;
-    last_write = 0;
+    : pin(_pin),
+      completed(true),
+      allow_detach(true),
+      min_width(uint16_t(_min)),
+      max_width(uint16_t(_max)),
+      motion(uint16_t((-1 == _pos) ? DefaultPos : _pos)) {
 }
 
 TomServo::~TomServo() {
@@ -28,31 +19,35 @@ bool TomServo::enableDetachment(bool const allow) {
     return allow_detach;
 }
 
+void TomServo::onComplete(tomservo_on_complete_cb_t const cb, void * const ctx) {
+    motion.set_on_complete(cb, ctx);
+}
+
 void TomServo::begin(uint32_t const _pos) {
 
-    pos = uint16_t(_pos);
-    delta = 0;
-    completed = true;
+    uint32_t const now = micros();
+    uint16_t const pos = uint16_t(_pos);
+
+    motion.begin_at(pos, now);
 
     servo.attach(pin, min_width, max_width);
     servo.write(pos);
 
-    // Allow time for the servo to physically reach the starting position.
-    // This is a rough upper bound based on pulse width range.
     delayMicroseconds((max_width - min_width) * 60);
 
     if (allow_detach) {
         servo.detach();
     }
 
-    last_write = micros();
+    completed = true;
 }
 
 void TomServo::write(uint32_t const _pos) {
 
-    pos = uint16_t(_pos);
-    delta = 0;
-    completed = true;
+    uint32_t const now = micros();
+    uint16_t const pos = uint16_t(_pos);
+
+    motion.write_immediate(pos, now);
 
     servo.attach(pin, min_width, max_width);
     servo.write(pos);
@@ -61,7 +56,7 @@ void TomServo::write(uint32_t const _pos) {
         servo.detach();
     }
 
-    last_write = micros();
+    completed = true;
 }
 
 void TomServo::write(uint16_t const _pos, uint32_t const dur) {
@@ -70,70 +65,51 @@ void TomServo::write(uint16_t const _pos, uint32_t const dur) {
 
     if (allow_detach) {
         servo.attach(pin, min_width, max_width);
+    } else if (!servo.attached()) {
+        servo.attach(pin, min_width, max_width);
     }
 
-    direction = (_pos > pos);
-    delta = direction ? (_pos - pos) : (pos - _pos);
+    bool const already_complete = motion.schedule_move(_pos, dur, micros());
 
-    if (0 == delta) {
-        // No movement required; treat as an immediate completion.
+    if (already_complete) {
         completed = true;
+
         if (allow_detach) {
             servo.detach();
         }
-        return;
-    }
 
-    // dur is the total time for delta degrees of motion.
-    // us_per_inc is time per 1-degree increment.
-    us_per_inc = dur / delta;
-    last_write = micros();
+        motion.fire_callback_if_pending();
+    }
 }
 
 bool TomServo::update() {
 
-    if (0 == delta && completed) {
+    if (motion.complete() && completed) {
         return true;
     }
 
-    uint32_t const now = micros();
+    bool did_write = false;
+    bool reached_target = false;
+    uint16_t new_pos = motion.position();
 
-    if (0 == us_per_inc) {
-        last_write = now;
-        return complete();
+    bool const idle = motion.update(micros(), did_write, new_pos, reached_target);
+
+    if (did_write) {
+        servo.write(new_pos);
     }
 
-    uint32_t const elapsed = now - last_write;
-    uint16_t const steps = elapsed / us_per_inc;
-
-    if (0 == steps) {
-        return false;
-    }
-
-    last_write += uint32_t(steps) * us_per_inc;
-
-    // Do not move farther than the remaining delta.
-    uint16_t const step_count = (steps > delta) ? delta : steps;
-
-    if (direction) {
-        pos += step_count;
-    } else {
-        pos -= step_count;
-    }
-
-    delta -= step_count;
-
-    servo.write(pos);
-
-    if (0 == delta) {
+    if (reached_target) {
         completed = true;
+
         if (allow_detach) {
             servo.detach();
         }
+
+        motion.fire_callback_if_pending();
         return false;
     }
 
-    return false;
+    return idle;
 }
 
 void TomServo::detach() {
@@ -153,7 +129,7 @@ bool TomServo::attached() {
 }
 
 uint32_t TomServo::position() const {
-    return pos;
+    return motion.position();
 }
 
 bool TomServo::complete() const {

@@ -3,6 +3,7 @@
 #######################################
 
 TomServo	KEYWORD1
+TomServoPCA9685	KEYWORD1
 
 begin	KEYWORD2
 write	KEYWORD2
@@ -14,3 +15,4 @@ minWidth	KEYWORD2
 maxWidth	KEYWORD2
 position	KEYWORD2
 complete	KEYWORD2
+onComplete	KEYWORD2

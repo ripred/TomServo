@@ -2,167 +2,40 @@
 
 **Sophisticated Servo Management for the Discriminating User.**
 
-TomServo is a servo control library for Arduino that focuses on:
+TomServo is an Arduino servo control library focused on:
 
-* **Power savings** for battery‑powered multi‑servo projects
-* **Smooth, timed motion** with simple easing
-* **Simple API** that feels like the stock `Servo` library, but smarter
+* **Big power savings** for battery-powered multi-servo projects
+* **Smooth timed motion** (duration in microseconds) using an `update()` loop
+* **Simple, Servo-like API** — but smarter
 
 Most hobby servos will happily hold position because of gearbox friction even when no valid PWM signal is present. As long as they keep seeing servo frames, the control electronics continue to drive the motor and burn current, even when “not moving”.
 
 TomServo leans into that:
 
 * It **attaches** only when a move is in progress.
-* It **detaches** when the move is complete (if enabled), so the servo controller sees no valid frames.
-* The servo coasts on gearbox friction, current draw drops dramatically, and you get a lot more runtime out of a battery.
+* It **detaches** when a move is complete (if enabled), so the servo sees no valid frames.
+* The servo holds by friction, current draw drops dramatically, and battery runtime improves.
 
-Ideal use cases:
+## Quick start
 
-* Battery‑powered robots and hexapods
-* Pan/tilt rigs
-* Animatronics where servos hold poses for long periods
-* Any project where servo idle current is a problem
+### Install
 
-## Version 1.0.5
+TomServo is compatible with the Arduino IDE:
 
-This version refines the motion model and internal state handling without changing the public API.
+1. Install via Arduino Library Manager **or**
+2. Download or clone this repository into your `libraries/` folder.
 
-### Highlights
+Include it in your sketch with:
 
-* Constructor now correctly initializes the starting position:
-  * If no starting position is passed (`pos == -1`), the servo starts at a default angle (`DefaultPos`, 90°).
-  * If a starting position is provided, it is respected and used to initialize the internal position.
-* `begin()`:
-  * Synchronizes the internal `pos` to the starting angle you pass.
-  * Attaches, writes the starting angle, waits briefly for the servo to reach it, then detaches if auto‑detach is enabled.
-* `write(target, duration)`:
-  * Distributes motion evenly across the requested duration.
-  * Uses microsecond timing via `micros()`.
-* `update()`:
-  * Prevents overshoot by clamping step size so it never moves beyond the target, even if `loop()` is delayed.
-* Comments and documentation now clearly state that:
-  * **Positions are angles in degrees** (same units as `Servo::write()`).
-  * **Durations are in microseconds**.
+    #include <TomServo.h>
 
-## Features
+If you want PCA9685 support, also install:
 
-* **Angle‑based API**:
-  * Positions are in degrees (0–180), just like the standard `Servo` library.
-* **Timed motion**:
-  * `write(target, duration)` moves from the current angle to `target` over a fixed duration (in microseconds).
-  * Motion is advanced in small increments inside `update()`.
-* **Automatic detach**:
-  * Per‑instance control via `enableDetachment(true/false)`.
-  * When a motion completes, the servo is optionally detached so it does not continuously draw current.
-* **Explicit `update()` loop**:
-  * Call `update()` frequently from `loop()` to advance any in‑progress motions.
-* **State queries**:
-  * `position()` returns the current servo angle in degrees.
-  * `complete()` reports whether the current scheduled motion is finished.
-  * `attached()` mirrors the underlying `Servo::attached()`.
+* **Adafruit PWM Servo Driver Library** (Library Manager)
 
-## API Overview
+## Examples (start here)
 
-### Construction
-
-    TomServo(int pin,
-             int min = MinWidth,
-             int max = MaxWidth,
-             int pos = -1);
-
-* `pin` – Arduino pin the servo is connected to.
-* `min`, `max` – pulse width limits (in microseconds) passed to `Servo::attach(pin, min, max)`.
-* `pos` – starting angle in degrees:
-  * If `pos == -1`, the starting angle defaults to `DefaultPos` (90°).
-  * If `pos >= 0`, the starting angle is initialized to that value.
-
-There are three related constants:
-
-    static uint16_t const MinWidth   = 544;
-    static uint16_t const MaxWidth   = 2400;
-    static uint16_t const DefaultPos = 90;
-
-### Core methods
-
-    void begin(uint32_t pos);
-    void write(uint32_t pos);
-    void write(uint16_t pos, uint32_t dur);
-    bool update();
-
-    bool enableDetachment(bool allow);
-
-    void detach();
-    bool attached();
-
-    uint32_t minWidth() const;
-    uint32_t maxWidth() const;
-    uint32_t position() const;  // degrees
-    bool complete() const;
-
-#### `begin(pos)`
-
-* Attaches the servo.
-* Moves immediately to `pos` (degrees).
-* Waits briefly for the servo to physically reach that position.
-* Detaches again if auto‑detach is enabled.
-* Internal `pos` is updated to match `pos`.
-
-Use this once in `setup()` to establish a known starting position.
-
-#### `write(pos)`
-
-* Immediate move to `pos` (degrees).
-* Attaches, writes the new angle, and detaches if auto‑detach is enabled.
-
-This is similar to calling `Servo::write()` but with TomServo’s attach/detach behavior.
-
-#### `write(pos, dur)`
-
-* Schedules a timed move from the current angle to `pos` (degrees).
-* `dur` is the total move time in **microseconds**.
-* Internally:
-  * Computes `delta = abs(target - current)` in degrees.
-  * Computes `us_per_inc = dur / delta`.
-  * Marks the servo as “in motion”.
-* Actual movement occurs incrementally in `update()`.
-
-#### `update()`
-
-Call this often from `loop()`. It:
-
-* Checks how much time has passed since the last step using `micros()`.
-* Computes how many 1‑degree steps to apply.
-* Clamps the step count so it never overshoots the remaining `delta`.
-* Writes the new angle via `Servo::write()`.
-* When `delta` reaches 0:
-  * Marks the motion as complete.
-  * Detaches the servo if auto‑detach is enabled.
-
-Return value:
-
-* `true` – No motion is in progress and nothing needs to be done for this servo.
-* `false` – Motion is in progress or work was just done this call.
-
-In practice, you’ll usually ignore the return value and use `complete()` to decide when to schedule a new move.
-
-#### `enableDetachment(allow)`
-
-Enable or disable auto‑detach behavior:
-
-    servo.enableDetachment(true);  // default; detach when done
-    servo.enableDetachment(false); // keep servo attached after moves
-
-#### `position()`
-
-Returns the current servo angle in degrees (same units you pass to `write()` and `begin()`).
-
-#### `complete()`
-
-Returns `true` when there is no motion in progress and the last move has reached its target.
-
-## Simple example: single servo sweep
-
-Basic sweep between two angles with timed motion.
+### 1) Single servo timed sweep (GPIO pin)
 
     #include <TomServo.h>
 
@@ -172,31 +45,25 @@ Basic sweep between two angles with timed motion.
     TomServo servo(SERVO_PIN);
 
     void setup() {
-        // Start at the default angle (90°)
         servo.begin(DefaultPos);
     }
 
     void loop() {
-        // Allow the servo to advance toward any scheduled target
         servo.update();
 
         static uint16_t target = 0;
 
         if (servo.complete()) {
-            if (0 == target) {
-                target = 180;
-            } else {
-                target = 0;
-            }
-
-            // Timed move from current angle to target over MOVE_TIME_US
+            target = (0 == target) ? 180 : 0;
             servo.write(target, MOVE_TIME_US);
         }
     }
 
-Because TomServo automatically detaches when a move completes (by default), the servo will hold its position by friction without continuously drawing as much current.
+Also available as an Arduino example sketch:
 
-## Multi‑servo power‑saving example
+* `File → Examples → TomServo → TomServo`
+
+### 2) Multi-servo power-saving pattern (interleaved motion)
 
 Two servos, with moves interleaved so only one is actively driven at a time. This pattern scales well to many servos on a shared battery.
 
@@ -215,7 +82,6 @@ Two servos, with moves interleaved so only one is actively driven at a time. Thi
         servo1.enableDetachment(true);
         servo2.enableDetachment(true);
 
-        // Start the servos at opposite ends of travel
         servo1.begin(0);
         servo2.begin(180);
     }
@@ -231,34 +97,182 @@ Two servos, with moves interleaved so only one is actively driven at a time. Thi
         if (1 == next_servo && servo1.complete() && servo2.complete()) {
             target1 = (0 == target1) ? 180 : 0;
             servo1.write(target1, MOVE_TIME1_US);
-
             next_servo = 2;
         }
 
         if (2 == next_servo && servo1.complete() && servo2.complete()) {
             target2 = (0 == target2) ? 180 : 0;
             servo2.write(target2, MOVE_TIME2_US);
-
             next_servo = 1;
         }
     }
 
-With this pattern:
+Also available as an Arduino example sketch:
 
-* At most one servo is actively moving at any time.
-* Both servos detach when they reach their targets.
-* Total current draw stays much lower than driving both servos continuously.
+* `File → Examples → TomServo → TomServoSweep`
 
-## Installation
+## New in 1.1.0
 
-TomServo is compatible with the Arduino IDE:
+Version **1.1.0** adds two major capabilities:
 
-1. Install via Arduino Library Manager **or**
-2. Download or clone this repository into your `libraries/` folder.
+### PCA9685 support (TomServoPCA9685)
 
-Include it in your sketch with:
+TomServo can optionally drive servos through a PCA9685 (16-channel I2C PWM expander) using the **same TomServo semantics** (degrees positions, microsecond durations, `update()` timing engine).
 
-    #include <TomServo.h>
+Important PCA9685 constraint: there is **no per-channel tri-state** and only one global OE (not suitable for per-servo detach). TomServoPCA9685 preserves the power-saving model by emulating per-servo detach:
 
-If you use TomServo in a project (especially a hexapod or any multi‑servo robot), feel free to share what you build.
+* **Attach (emulated):** write a valid servo pulse for that channel (angle → µs → ticks)
+* **Detach (emulated):** output an invalid servo waveform per channel (constant LOW)
+
+Example sketches:
+
+* `File → Examples → TomServo → TomServoPCA9685Sweep`
+* `File → Examples → TomServo → TomServoPCA9685Multi`
+* `File → Examples → TomServo → TomServoPCA9685ChainedSync`
+
+### Completion callbacks (motion chaining)
+
+You can register a callback that fires **once** when a timed move reaches its target:
+
+* Only for `write(target, duration)` (timed moves)
+* Not for `begin()` or `write(target)` immediate moves
+* Intended for chaining a dynamic number of motions
+
+The callback demo sketch:
+
+* `File → Examples → TomServo → TomServoPCA9685ChainedSync`
+
+### Synchronized arrival (organic motion)
+
+A very practical animation trick: command multiple servos to move over the **same total duration**, even if they travel different distances, so they **arrive together**.
+
+This creates motion that looks more fluid/intentional (especially for animatronics), and it’s naturally supported by TomServo’s timed motion model.
+
+The `TomServoPCA9685ChainedSync` example demonstrates:
+
+1) Servo 1 moves and triggers Servo 2 via callback  
+2) Both servos then return to 0 over the same duration and arrive together
+
+## Core concepts (what makes TomServo different)
+
+### Degrees-based positions
+
+TomServo positions are angles in degrees (0–180 typical), just like the stock `Servo` library.
+
+### Microsecond durations
+
+Timed moves use **microseconds** for duration:
+
+* `write(target, duration_us)`
+
+### Auto-detach power saving
+
+When enabled (default), TomServo detaches after motion completes:
+
+* GPIO/Servo backend: `Servo::detach()` stops the pulses entirely
+* PCA9685 backend: per-channel output is set to an invalid servo waveform (constant LOW)
+
+In both cases, the servo is no longer being actively driven while idle.
+
+## API overview (reference)
+
+### Construction
+
+    TomServo(int pin,
+             int min = MinWidth,
+             int max = MaxWidth,
+             int pos = -1);
+
+* `pin` – Arduino pin the servo is connected to.
+* `min`, `max` – pulse width limits (microseconds) passed to `Servo::attach(pin, min, max)`.
+* `pos` – starting angle in degrees:
+  * If `pos == -1`, the starting angle defaults to `DefaultPos` (90°).
+  * If `pos >= 0`, the starting angle is initialized to that value.
+
+Constants:
+
+    static uint16_t const MinWidth   = 544;
+    static uint16_t const MaxWidth   = 2400;
+    static uint16_t const DefaultPos = 90;
+
+### Core methods
+
+    void begin(uint32_t pos);
+    void write(uint32_t pos);
+    void write(uint16_t pos, uint32_t dur_us);
+    bool update();
+
+    bool enableDetachment(bool allow);
+
+    void onComplete(tomservo_on_complete_cb_t cb, void * ctx);
+
+    void detach();
+    bool attached();
+
+    uint32_t minWidth() const;
+    uint32_t maxWidth() const;
+    uint32_t position() const;  // degrees
+    bool complete() const;
+
+#### `begin(pos)`
+
+* Attaches the servo
+* Moves immediately to `pos` (degrees)
+* Waits briefly for the servo to physically reach that position
+* Detaches again if auto-detach is enabled
+* Internal `pos` is updated to match `pos`
+
+Use once in `setup()` to establish a known starting position.
+
+#### `write(pos)`
+
+Immediate move to `pos` (degrees). Attaches, writes, and detaches if enabled.
+
+#### `write(pos, dur_us)`
+
+Schedules a timed move from the current angle to `pos` over **dur_us microseconds**.
+
+Internally:
+
+* `delta = abs(target - current)` in degrees
+* `us_per_inc = dur_us / delta`
+
+Actual movement occurs incrementally in `update()`.
+
+#### `update()`
+
+Call frequently from `loop()`:
+
+* uses `micros()` to compute how many 1-degree steps to apply
+* clamps step count so it never overshoots
+* writes the new angle
+* when motion completes:
+  * marks complete
+  * detaches if enabled
+  * fires the completion callback (if registered)
+
+Return value:
+
+* `true` – no motion is in progress and nothing needs doing
+* `false` – motion in progress or work performed this call
+
+## Version history
+
+### Version 1.1.0
+
+* Optional PCA9685 support via `TomServoPCA9685` (Adafruit driver)
+* Optional completion callback for chaining timed motion
+* PCA9685 examples: sweep, multi-servo interleaving, chained+sync demo
+
+### Version 1.0.5
+
+Refined motion model and internal state handling without changing the public API.
+
+* Constructor initializes starting position correctly (default 90° if `pos == -1`)
+* `begin()` synchronizes internal `pos`, attaches, writes, waits, detaches if enabled
+* `write(target, duration)` uses microsecond timing via `micros()`
+* `update()` clamps steps to prevent overshoot
+* Documentation clarifies:
+  * positions are degrees
+  * durations are microseconds
 
