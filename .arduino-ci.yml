@@ -22,8 +22,8 @@ compile:
 #    - rpipico
   libraries:
     - "Servo"
-  examples_to_exclude:
-    - TomServoCurrentDemo
+    - "CPUVolt"
 
 libraries:
   - "Servo"
+  - "CPUVolt"
