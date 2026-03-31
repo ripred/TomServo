@@ -29,7 +29,7 @@ Include it in your sketch with:
 
     #include <TomServo.h>
 
-If you want PCA9685 support, also install:
+If you want PCA9685 support TomServo now supports that! Just install the additional library:
 
 * **Adafruit PWM Servo Driver Library** (Library Manager)
 
