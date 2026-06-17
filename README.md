@@ -1,5 +1,14 @@
 # TomServo
 
+[![Arduino CI](https://github.com/ripred/TomServo/actions/workflows/arduino_test_runner.yml/badge.svg)](https://github.com/ripred/TomServo/actions/workflows/arduino_test_runner.yml)
+[![Arduino-lint](https://github.com/ripred/TomServo/actions/workflows/arduino-lint.yml/badge.svg)](https://github.com/ripred/TomServo/actions/workflows/arduino-lint.yml)
+[![JSON check](https://github.com/ripred/TomServo/actions/workflows/jsoncheck.yml/badge.svg)](https://github.com/ripred/TomServo/actions/workflows/jsoncheck.yml)
+[![Arduino Library Manager](https://www.ardu-badge.com/badge/TomServo.svg)](https://www.ardu-badge.com/TomServo)
+[![GitHub release](https://flat.badgen.net/github/release/ripred/TomServo)](https://github.com/ripred/TomServo/releases/latest)
+[![License](https://flat.badgen.net/github/license/ripred/TomServo)](https://github.com/ripred/TomServo/blob/main/LICENSE)
+[![Stars](https://flat.badgen.net/github/stars/ripred/TomServo)](https://github.com/ripred/TomServo/stargazers)
+[![Forks](https://flat.badgen.net/github/forks/ripred/TomServo)](https://github.com/ripred/TomServo/network/members)
+
 **Sophisticated Servo Management for the Discriminating User.**
 
 TomServo is an Arduino servo control library focused on:
@@ -275,4 +284,3 @@ Refined motion model and internal state handling without changing the public API
 * Documentation clarifies:
   * positions are degrees
   * durations are microseconds
-
